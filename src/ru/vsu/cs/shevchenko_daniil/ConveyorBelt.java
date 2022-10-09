@@ -4,66 +4,75 @@ import java.awt.*;
 
 public class ConveyorBelt {
 
-    private int x1, y1, x2, y2, length;
+    private int y, width, length, step;
+    private int position = 0;
     private Color color;
 
-    public ConveyorBelt(int x1, int y1, int x2, int y2, int length, Color color) {
-        this.x1 = x1;
-        this.y1 = y1;
-        this.x2 = x2;
-        this.y2 = y2;
+    public ConveyorBelt(int y, int width, int length, int step, Color color) {
+        this.y = y;
+        this.width = width;
+        this.length = length;
+        this.step = step;
         this.color = color;
     }
 
     void draw (Graphics2D graphics) {
-        DrawingThings.drawConveyorBelt(graphics, getX1(), getY1(), getX2(), getY2(), getLength(), getColor());
+        graphics.setColor(Color.black);
+        graphics.drawLine(0, y, width, y);
+        graphics.drawLine(0, y, 0, y + length);
+        graphics.drawLine(0, y+length, width, y+length);
+        graphics.setColor(color);
+        graphics.fillRect(1, y+1, width-1, length);
+
+        graphics.setColor(Color.black);
+        for (int i = 0; i < width/step + 2; i++) {
+            graphics.drawLine(step*i+10 + position, y, step*i + 10 + position, y+length);
+        }
     }
 
-    void draw()
-
-    void resize(int newLength) {
-        setX1(newLength+100);
-        setX2(newLength+100);
+    public void incPosition() {
+        position++;
+        if (position == step) {
+            position = 0;
+        }
     }
 
-    public int getX1() {
-        return x1;
+    public void resize(int width, int height) {
+        setY(height/2);
+        setWidth(width);
+        setLength(height/8);
     }
 
-    public void setX1(int x1) {
-        this.x1 = x1;
+    public int getY() {
+        return y;
     }
 
-    public int getY1() {
-        return y1;
+    public void setY(int y) {
+        this.y = y;
     }
 
-    public void setY1(int y1) {
-        this.y1 = y1;
+    public int getPosition() {
+        return position;
     }
 
-    public int getX2() {
-        return x2;
+    public void setPosition(int position) {
+        this.position = position;
     }
 
-    public void setX2(int x2) {
-        this.x2 = x2;
+    public int getStep() {
+        return step;
     }
 
-    public int getY2() {
-        return y2;
+    public void setStep(int step) {
+        this.step = step;
     }
 
-    public void setY2(int y2) {
-        this.y2 = y2;
+    public int getWidth() {
+        return width;
     }
 
-    public Color getColor() {
-        return color;
-    }
-
-    public void setColor(Color color) {
-        this.color = color;
+    public void setWidth(int width) {
+        this.width = width;
     }
 
     public int getLength() {
@@ -74,5 +83,11 @@ public class ConveyorBelt {
         this.length = length;
     }
 
+    public Color getColor() {
+        return color;
+    }
 
+    public void setColor(Color color) {
+        this.color = color;
+    }
 }
