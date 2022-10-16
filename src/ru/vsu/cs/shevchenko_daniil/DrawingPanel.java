@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Random;
 
 public class DrawingPanel extends JPanel {
 
@@ -13,76 +14,149 @@ public class DrawingPanel extends JPanel {
     private static final Color moldOut = new Color(0x72512D);
     private static final Color backgroundPlateColor1 = new Color(194, 197, 206);
     private static final Color backgroundPlateColor2 = new Color(149, 152, 157);
+    private static final Color cakeColor1 = new Color(0xC5C4A5A5, true);
 
 
-    private Timer t;
+    private Timer t1, t2, t3;
     private int oldHeight, oldWight;
 
-    private ConveyorBelt conveyorBelt;
-    private CakeMold cakeMold;
+    private ConveyorBelt conveyorBelt1;
+    private ConveyorBelt conveyorBelt2;
+    private ConveyorBelt conveyorBelt3;
+    private Cake cake;
     private Background background;
 
     private CakeMold[] cakeMolds;
+    private CakeMold cakeMold;
+
+    private Random rnd;
 
     public DrawingPanel() {
+
+        rnd = new Random();
 
         oldHeight = getHeight();
         oldWight = getWidth();
         setSize(1920, 1080);
 
-        conveyorBelt = new ConveyorBelt(
-                getHeight()/2,
+
+        conveyorBelt1 = new ConveyorBelt(
+                getHeight() / 2,
                 getWidth(),
-                getHeight()/8,
+                getHeight() / 8,
                 200,
-                conveyorBeltColor);
+                conveyorBeltColor
+        );
+
+        conveyorBelt2 = new ConveyorBelt(
+                getHeight() / 3,
+                getWidth(),
+                getHeight() / 16,
+                100,
+                conveyorBeltColor
+        );
+
+        conveyorBelt3 = new ConveyorBelt(
+                getHeight() / 5,
+                getWidth(),
+                getHeight() / 32,
+                50,
+                conveyorBeltColor
+        );
 
         cakeMold = new CakeMold(
-                conveyorBelt.getStep()/3+1500,
-                conveyorBelt.getY()+ conveyorBelt.getLength()/15,
-                conveyorBelt.getLength()-20,
+                conveyorBelt1.getStep()  * 2 + conveyorBelt1.getPosition() - 20,
+                conveyorBelt1.getY()+ conveyorBelt1.getLength()/15,
+                conveyorBelt1.getLength()-20,
                 moldOut,
-                moldIn);
+                moldIn
+        );
 
-        cakeMolds = new CakeMold[10];
-        for (int i = 0; i < 10; i++) {
+       /* cakeMolds = new CakeMold[3];
+        for (int i = 0; i < 3; i++) {
             cakeMolds[i] = new CakeMold(
-                    conveyorBelt.getStep() * i + conveyorBelt.getPosition() - 30,
+                    conveyorBelt.getStep() * i * 2 + conveyorBelt.getPosition() - 20,
                     conveyorBelt.getY()+ conveyorBelt.getLength()/15,
                     conveyorBelt.getLength()-20,
                     moldOut,
                     moldIn);
-        }
+        }*/
+
+        cake = new Cake(
+                1,
+                2,
+                40,
+                cakeMold.getX()-55,
+                cakeMold.getY()+cakeMold.getR()/2,
+                cakeColor1,
+                moldIn
+        );
 
         background = new Background(
-                conveyorBelt.getY()+conveyorBelt.getLength(),
+                conveyorBelt1.getY()+conveyorBelt1.getLength(),
                 getWidth(),
                 500,
-                conveyorBelt.getStep()/2,
+                conveyorBelt1.getStep()/2,
                 backgroundPlateColor1,
                 backgroundPlateColor2
         );
 
 
-        t = new Timer(10, new AbstractAction() {
+        t1 = new Timer(1, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                conveyorBelt.incPosition();
-                for (int i = 0; i < 10; i++)
-                    cakeMolds[i].move();
+                conveyorBelt1.incPosition();
+                /*for (int i = 0; i < 3; i++)
+                    cakeMolds[i].move();*/
+                cakeMold.move();
+                cake.move();
                 repaint();
             }
         });
 
+        t2 = new Timer(5, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                conveyorBelt2.incPosition();
+                repaint();
+            }
+        });
+
+        t3 = new Timer(10, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                conveyorBelt3.incPosition();
+                repaint();
+            }
+        });
+
+
+
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (t.isRunning()){
+                if (t1.isRunning()){
 
-                    t.stop();
+                    t1.stop();
                 }
                 else {
-                    t.start();
+                    t1.start();
+                }
+
+                if (t2.isRunning()){
+
+                    t2.stop();
+                }
+                else {
+                    t2.start();
+                }
+
+                if (t3.isRunning()){
+
+                    t3.stop();
+                }
+                else {
+                    t3.start();
                 }
             }
         });
@@ -104,14 +178,22 @@ public class DrawingPanel extends JPanel {
             oldWight=getWidth();
             conveyorBelt.resize(oldWight, oldHeight);
         }*/
-
-        conveyorBelt.draw(graphics);
-        for (int i = 0; i < 10; i++) {
+        background.drawFloor(graphics, conveyorBelt1.getY(), 50, Color.black, Color.white);
+        background.drawWall(graphics, conveyorBelt3.getY()-10);
+        background.drawButtons(graphics);
+        background.drawDoor(graphics);
+        background.drawTopPanel(graphics);
+        conveyorBelt1.draw(graphics);
+        conveyorBelt2.draw(graphics);
+        conveyorBelt3.draw(graphics);
+        /*for (int i = 0; i < 3; i++) {
             cakeMolds[i].draw(graphics);
-        }
-        background.draw(graphics);
+        }*/
+        cakeMold.draw(graphics);
+        background.drawBottom(graphics);
+        cake.draw(graphics);
 
-
+        background.drawRoof(graphics);
 
 
     }
